@@ -2,6 +2,7 @@
 
 const http = require('http');
 const url = require('url');
+const StringDecoder = require('string_decoder').StringDecoder;
 
 // Respond to requests with string
 const server = http.createServer(function(req,res) {
@@ -21,6 +22,9 @@ const server = http.createServer(function(req,res) {
 
 	// Get headers as an object
 	const headers = req.headers;
+
+	// Get the payload if any
+	const decoder = new StringDecoder('utf-8');
 
 	// Send response
 	res.end('Hello World\n');
