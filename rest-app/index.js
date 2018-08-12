@@ -6,6 +6,7 @@ const url = require('url');
 const config = require('./config');
 const StringDecoder = require('string_decoder').StringDecoder;
 const fs = require('fs');
+// const _data = require('./lib/data');
 
 // Instantiating server
 const httpServer = http.createServer(function(req,res) {
@@ -39,7 +40,7 @@ const unifiedServer = function(req, res) {
 	const trimmedPath = path.replace(/^\/+|\/+$/g,'');
 
 	// Get query string as object
-	var queryStringObject = parsedUrl.query;
+	const queryStringObject = parsedUrl.query;
 
 	// Get http method
 	const method = req.method.toLowerCase();
