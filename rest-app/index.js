@@ -3,9 +3,11 @@
 const http = require('http');
 const https = require('https');
 const url = require('url');
-const config = require('./config');
+const config = require('./lib/config');
 const StringDecoder = require('string_decoder').StringDecoder;
 const fs = require('fs');
+const handlers = require('./lib/handlers');
+const helpers = require('./lib/helpers');
 // const _data = require('./lib/data');
 
 // Instantiating server
@@ -66,7 +68,7 @@ const unifiedServer = function(req, res) {
 			'queryStringObject' : queryStringObject,
 			'method' : method,
 			'headers' : headers,
-			'payload' : buffer
+			'payload' : helpers.parseJsonToObject(buffer)
 		}
 
 		// Route request to chosen handler
@@ -93,24 +95,11 @@ const unifiedServer = function(req, res) {
 	});
 };
 
-// Define handlers
-var handlers = {};
 
-handlers.ping = function(data, callback) {
-	// Callback http status code
-	callback(200);
-};
-
-handlers.notFound = function(data, callback) {
-	callback(404);
-};
-
-handlers.hello = function(data, callback) {
-	callback(200, {'message' : 'Hello this is Chooi-Guan Lim, Team Cloud Lead at Scania AB!'});
-};
 
 // Define request router
 var router = {
 	'ping' : handlers.ping,
-	'hello' : handlers.hello
+	'hello' : handlers.hello,
+	'users' : handlers.users
 }

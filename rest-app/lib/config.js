@@ -7,13 +7,15 @@ var environments = {};
 environments.staging = {
 	'httpPort' : 3100,
 	'httpsPort' : 3101,
-	'envName' : 'staging'
+	'envName' : 'staging',
+	'hashingSecret' : 'superSecret'
 };
 
 environments.production = {
 	'httpPort' : 5000,
 	'httpsPort' : 5001,
-	'envName' : 'production'
+	'envName' : 'production',
+	'hashingSecret' : 'superSecretHuge'
 };
 
 // Determine which one to export
