@@ -8,14 +8,16 @@ environments.staging = {
 	'httpPort' : 3100,
 	'httpsPort' : 3101,
 	'envName' : 'staging',
-	'hashingSecret' : 'superSecret'
+	'hashingSecret' : 'superSecret',
+	'maxChecks' : 5
 };
 
 environments.production = {
 	'httpPort' : 5000,
 	'httpsPort' : 5001,
 	'envName' : 'production',
-	'hashingSecret' : 'superSecretHuge'
+	'hashingSecret' : 'superSecretHuge',
+	'maxChecks' : 5
 };
 
 // Determine which one to export
