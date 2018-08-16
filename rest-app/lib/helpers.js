@@ -2,6 +2,8 @@
 
 const crypto = require('crypto');
 const config = require('./config');
+const https = require('https');
+const querystring = require('querystring');
 
 const helpers = {};
 
@@ -39,6 +41,59 @@ helpers.createRandomString = function(strLength) {
         return str;
     } else {
         return false;
+    }
+}
+
+// Send an SMS message to Twilio
+helpers.sendTwilioSms = function(phone, msg, callback) {
+    phone = typeof(phone) == 'string' && phone.trim().length == 10 ? phone : false;
+    msg = typeof(msg) == 'string' && msg.trim().length > 0 && msg.trim().length <= 1600 ? msg.trim() : false;
+    if (phone && msg) {
+        // Configure the request payload
+        const payload = {
+            'From' : config.twilio.fromPhone,
+            'To' : '+1'+phone,
+            'Body' : msg
+        };
+        // Send payload to Twilio as a POST
+        const stringPayload = querystring.stringify(payload);
+
+        // Configure request details
+        const requestDetails = {
+            'protocol' : 'https:',
+            'hostname' : 'api.twilio.com',
+            'method' : 'POST',
+            'post' : '/2010-04-01/Accounts/'+config.twilio.accountSid+'/Messages.json',
+            'auth' : config.twilio.accountSid+':'+config.twilio.authToken,
+            'headers' : {
+                'Content-Type' : 'application/x-www-form-urlencoded',
+                'Content-Length' : Buffer.byteLength(stringPayload)
+            }
+        };
+
+        // Instantiate request object
+        const request = https.request(requestDetails, function(res) {
+            const status = res.statusCode;
+            // Callback successfully if request went through
+            if (status == 200 || status == 201) {
+                callback(false);
+            } else {
+                callback('Status code returned was '+status);
+            }
+        });
+
+        // Bind to the error event so it doesn't get thrown
+        request.on('error', function(e) {
+            callback(e);
+        });
+
+        // Add payload
+        request.write(stringPayload);
+
+        // End request
+        request.end();
+    } else {
+        callback('Given parameters were missing or invald');
     }
 }
 
