@@ -46,7 +46,7 @@ helpers.createRandomString = function(strLength) {
 
 // Send an SMS message to Twilio
 helpers.sendTwilioSms = function(phone, msg, callback) {
-    phone = typeof(phone) == 'string' && phone.trim().length == 10 ? phone : false;
+    phone = typeof(phone) == 'string' && phone.trim().length == 10 ? phone.trim() : false;
     msg = typeof(msg) == 'string' && msg.trim().length > 0 && msg.trim().length <= 1600 ? msg.trim() : false;
     if (phone && msg) {
         // Configure the request payload
@@ -58,12 +58,15 @@ helpers.sendTwilioSms = function(phone, msg, callback) {
         // Send payload to Twilio as a POST
         const stringPayload = querystring.stringify(payload);
 
+        console.log('/2010-04-01/Accounts/'+config.twilio.accountSid+'/Messages.json');
+        console.log(config.twilio.accountSid+':'+config.twilio.authToken);
+
         // Configure request details
         const requestDetails = {
             'protocol' : 'https:',
             'hostname' : 'api.twilio.com',
             'method' : 'POST',
-            'post' : '/2010-04-01/Accounts/'+config.twilio.accountSid+'/Messages.json',
+            'path' : '/2010-04-01/Accounts/'+config.twilio.accountSid+'/Messages.json',
             'auth' : config.twilio.accountSid+':'+config.twilio.authToken,
             'headers' : {
                 'Content-Type' : 'application/x-www-form-urlencoded',

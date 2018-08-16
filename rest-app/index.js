@@ -11,9 +11,9 @@ const helpers = require('./lib/helpers');
 // const _data = require('./lib/data');
 
 //@TODO testing
-helpers.sendTwilioSms('4158375309','Hello', function(err) {
-	console.log('This was an error', err);
-});
+//helpers.sendTwilioSms('5017122661','Hello', function(err) {
+//	console.log('This was an error', err);
+//});
 
 // Instantiating server
 const httpServer = http.createServer(function(req,res) {
