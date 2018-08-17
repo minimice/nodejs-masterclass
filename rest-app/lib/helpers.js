@@ -58,8 +58,8 @@ helpers.sendTwilioSms = function(phone, msg, callback) {
         // Send payload to Twilio as a POST
         const stringPayload = querystring.stringify(payload);
 
-        console.log('/2010-04-01/Accounts/'+config.twilio.accountSid+'/Messages.json');
-        console.log(config.twilio.accountSid+':'+config.twilio.authToken);
+        //console.log('/2010-04-01/Accounts/'+config.twilio.accountSid+'/Messages.json');
+        //console.log(config.twilio.accountSid+':'+config.twilio.authToken);
 
         // Configure request details
         const requestDetails = {

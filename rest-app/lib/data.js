@@ -8,7 +8,7 @@ const helpers = require('./helpers');
 var lib = {};
 
 // Base directory of data folder
-lib.baseDir = path.join(__dirname,'../.data/');
+lib.baseDir = path.join(__dirname,'/../.data/');
 
 // Write data to a file
 lib.create = function(dir, file, data, callback) {
@@ -38,7 +38,7 @@ lib.create = function(dir, file, data, callback) {
 };
 
 // Read data from a file
-lib.read = function(dir,file,callback) {
+lib.read = function(dir, file, callback) {
 	fs.readFile(lib.baseDir+dir+'/'+file+'.json','utf8', function(err,data) {
 		if (!err && data) {
 			const parsedData = helpers.parseJsonToObject(data);
@@ -50,7 +50,7 @@ lib.read = function(dir,file,callback) {
 }
 
 // Update data inside a file
-lib.update = function(dir,file,data,callback) {
+lib.update = function(dir, file, data, callback) {
 	fs.open(lib.baseDir+dir+'/'+file+'.json','r+', function(err,fileDescriptor) {
 		if (!err && fileDescriptor) {
 			const stringData = JSON.stringify(data);
@@ -80,7 +80,7 @@ lib.update = function(dir,file,data,callback) {
 }
 
 // Delete file
-lib.delete = function(dir,file,callback) {
+lib.delete = function(dir, file, callback) {
 	// Unlink the file
 	fs.unlink(lib.baseDir+dir+'/'+file+'.json', function(err) {
 		if (!err) {
