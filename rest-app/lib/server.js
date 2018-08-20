@@ -10,6 +10,8 @@ const fs = require('fs');
 const handlers = require('./handlers');
 const helpers = require('./helpers');
 const path = require('path');
+const util = require('util');
+const debug = util.debuglog('server');
 
 // Instantiate server module object
 const server = {};
@@ -84,8 +86,13 @@ server.unifiedServer = function(req, res) {
 			// Send response
 			res.end(payLoadString);
 
-			// Log request path
-			console.log('Returning: ', statusCode, payLoadString);
+			// Log request path, if response is green, print green, otherwise red
+			if (statusCode == 200) {
+				debug('\x1b[32m%s\x1b[0m',method.toUpperCase()+ ' /' + trimmedPath + ' ' + statusCode);
+			} else {
+				debug('\x1b[31m%s\x1b[0m',method.toUpperCase()+ ' /' + trimmedPath + ' ' + statusCode);
+			}
+			
 		});
 	});
 };
