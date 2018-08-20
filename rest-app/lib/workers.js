@@ -243,6 +243,10 @@ workers.rotateLogs = function() {
 
 // Init script
 workers.init = function() {
+
+    // Send to console in yellow
+    console.log('\x1b[33m%s\x1b[0m','Background workers are running');
+
     // Execute all checks
     workers.gatherAllChecks();
 
