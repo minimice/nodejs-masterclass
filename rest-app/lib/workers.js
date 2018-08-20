@@ -8,6 +8,7 @@ const https = require('https');
 const http = require('http');
 const helpers = require('./helpers');
 const url = require('url');
+const _logs = require('./logs');
 
 // Instantiate worker object
 const workers = {};
@@ -16,7 +17,7 @@ const workers = {};
 workers.loop = function() {
     setInterval(function() {
         workers.gatherAllChecks();
-    },100 * 60);
+    },1000 * 60);
 };
 
 workers.gatherAllChecks = function() {
@@ -144,10 +145,16 @@ workers.performCheckOutcome = function(originalCheckData, checkOutcome) {
     const state = !checkOutcome.error && checkOutcome.responseCode && originalCheckData.successCodes.indexOf(checkOutcome.responseCode) > -1 ? 'up' : 'down';
     // Decide if alert is warranted
     const alertWarranted = originalCheckData.lastChecked && originalCheckData.state !== state;
+
+    const timeOfCheck = Date.now();
+    workers.log(originalCheckData, checkOutcome, state, alertWarranted, timeOfCheck);
+
     // Update the check data
     const newCheckData = originalCheckData;
     newCheckData.state = state;
-    newCheckData.lastChecked = Date.now();
+    newCheckData.lastChecked = timeOfCheck;
+
+
     // Save the update
     _data.update('checks',newCheckData.id,newCheckData, function(err) {
         if (!err) {
@@ -174,6 +181,66 @@ workers.alertUserToStatusChange = function(newCheckData) {
     });
 };
 
+workers.log = function(originalCheckData, checkOutcome, state, alertWarranted, timeOfCheck) {
+    // Form log data
+    const logData = {
+        'check' : originalCheckData,
+        'outcome' : checkOutcome,
+        'state' : state,
+        'alert' : alertWarranted,
+        'time' : timeOfCheck
+    }
+    // Convert data to a string
+    const logString = JSON.stringify(logData);
+    // Determine name of log file
+    const logFileName = originalCheckData.id;
+    // Append log string to the file
+    _logs.append(logFileName, logString, function(err) {
+        if (!err) {
+            console.log("Logging to a file succeeded");
+        } else {
+            console.log("Logging to file failed");
+        }
+    });
+
+};
+
+// Timer to execute log rotation process once per day
+workers.logRotationLoop = function() {
+    setInterval(function() {
+        workers.rotateLogs();
+    },1000 * 60 * 60 * 24);
+};
+
+// Rotate (compress) the log files
+workers.rotateLogs = function() {
+    // List all uncompressed log files
+    _logs.list(false, function(err, logs) {
+        if (!err && logs && logs.length > 0) {
+            logs.forEach(function(logName) {
+                const logId = logName.replace('.log','');
+                const newFileId = logId+'-'+Date.now();
+                _logs.compress(logId,newFileId, function(err) {
+                    if (!err) {
+                        // Truncate the logs
+                        _logs.truncate(logId, function(err) {
+                            if (!err) {
+                                console.log('Success truncating log file');
+                            } else {
+                                console.log('Error truncating log file');
+                            }
+                        });
+                    } else {
+                        console.log('Error compressiong one of the log files', err);
+                    }
+                });
+            });
+        } else {
+            console.log('No logs found to rotate');
+        }
+    });
+};
+
 // Init script
 workers.init = function() {
     // Execute all checks
@@ -181,6 +248,12 @@ workers.init = function() {
 
     // Call loop so checks will execute later on
     workers.loop();
+
+    // Compress all logs immediately
+    workers.rotateLogs();
+
+    // Call compresion loop so logs will be compressed later
+    workers.logRotationLoop();
 };
 
 module.exports = workers;
